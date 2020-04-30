@@ -1,31 +1,24 @@
 package main;
 
-import com.mysql.jdbc.exceptions.MySQLSyntaxErrorException;
+import com.google.gson.Gson;
+import dataUser.User;
+import dataBase.DataBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class WallParser {
     private static String token;
     private static final String versionAPI = "5.103";
-
-
-    public static void addDataBase(Statement statement) throws IOException, SQLException, ClassNotFoundException, MySQLSyntaxErrorException {
-        System.out.println("Connection");
-        statement.executeUpdate("drop table Users");
-        statement.executeUpdate("create table if not exists Users (id MEDIUMINT NOT NULL AUTO_INCREMENT, name CHAR(30) NOT NULL, PRIMARY KEY (id))");
-        statement.executeUpdate("insert into Users (name) values ('')");
-        statement.executeUpdate("insert into Users set name = ''");
-        statement.executeUpdate("insert into Users set name = ''");
-    }
 
     public static StringBuilder parserDataGroup(String response) throws IOException {
         JSONObject jsonObject = new JSONObject(response);
@@ -41,17 +34,19 @@ public class WallParser {
         return strId;
     }
 
-    public static void parserDataUser(String response) throws IOException {
-
+    public static ArrayList<User> parserDataUser(String response, ArrayList<User> arrayList) {
+        DataBase dataBase = new DataBase();
+        Gson gson = new Gson();
         JSONObject jsonObject = new JSONObject(response);
         JSONArray array = jsonObject.getJSONArray("response");
 
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
-            System.out.println(object.get("first_name") + " " + object.get("last_name"));
+            User user = gson.fromJson(object.toString(), User.class);
+            arrayList.add(user);
         }
 
-        System.out.println();
+        return arrayList;
     }
 
     public static Document connectDataUser(StringBuilder strId) throws IOException {
@@ -94,7 +89,13 @@ public class WallParser {
         return doc;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void createDataBase(ArrayList<User> arrayList) throws SQLException, ClassNotFoundException {
+        DataBase dataBase = new DataBase();
+        dataBase.initDataBase(arrayList);
+    }
+
+    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
+        ArrayList<User> arrayList= new ArrayList<>();
         String domain = "iu7memes";
         StringBuilder strId;
         Document doc;
@@ -107,6 +108,7 @@ public class WallParser {
         strId = parserDataGroup(doc.text());
         doc = connectDataUser(strId);
 
-        parserDataUser(doc.text());
+        parserDataUser(doc.text(), arrayList);
+        createDataBase(arrayList);
     }
 }
