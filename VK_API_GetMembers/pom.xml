@@ -59,6 +59,12 @@
             <version>20190722</version>
         </dependency>
 
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.46</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/fluent-hc -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
