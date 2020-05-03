@@ -3,9 +3,3 @@ before_script:
  - echo "Starting build"
 script:
  - mvn clean package
-after_script:
- - echo "Script finished"
-after_success:
- - echo "Build was successful. $TRAVIS_TEST_RESULT"
-after_failure:
- - echo "Build was failed"
