@@ -1,30 +1,36 @@
-package main;
+package com.vk_api_lib.dataUsers.wallParser;
 
 import com.google.gson.Gson;
-import dataUser.User;
-import dataBase.DataBase;
+import com.vk_api_lib.dataUsers.dataUser.User;
+import com.vk_api_lib.dataUsers.dataBase.DataBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class WallParser {
     private static String token;
-    private static final String versionAPI = "5.103";
+    private static String versionAPI;
+    private static String domain;
+    private static DataBase dataBase;
 
-    public static StringBuilder parserDataGroup(String response) throws IOException {
+
+    public WallParser(String token, String versionAPI, String domain, DataBase dataBase) {
+        WallParser.token = token;
+        WallParser.versionAPI = versionAPI;
+        WallParser.domain = domain;
+        WallParser.dataBase = dataBase;
+    }
+
+    private static StringBuilder parserDataGroup(String response){
         JSONObject jsonObject = new JSONObject(response);
         JSONObject responseObject = jsonObject.getJSONObject("response");
         JSONArray array = responseObject.getJSONArray("items");
-        StringBuilder strId = new StringBuilder("");
+        StringBuilder strId = new StringBuilder();
 
         for (int i = 0; i < array.length(); i++) {
             strId.append(Integer.toString(array.getInt(i)));
@@ -34,8 +40,7 @@ public class WallParser {
         return strId;
     }
 
-    public static ArrayList<User> parserDataUser(String response, ArrayList<User> arrayList) {
-        DataBase dataBase = new DataBase();
+    private static void parserDataUser(String response, ArrayList<User> arrayList) {
         Gson gson = new Gson();
         JSONObject jsonObject = new JSONObject(response);
         JSONArray array = jsonObject.getJSONArray("response");
@@ -46,10 +51,9 @@ public class WallParser {
             arrayList.add(user);
         }
 
-        return arrayList;
     }
 
-    public static Document connectDataUser(StringBuilder strId) throws IOException {
+    private static Document connectDataUser(StringBuilder strId) throws IOException {
         String url = "https://api.vk.com/method/users.get";
         HashMap<String, String> map = new HashMap<>();
         map.put("access_token", token);
@@ -58,20 +62,18 @@ public class WallParser {
         map.put("user_ids", strId.toString());
         map.put("fields", "city, country, home_town, " +
                 "photo_max_orig, online, domain, has_mobile," +
-                " contacts, site, Ceducation, Cstatus, Cconnections, " +
+                " contacts, site, education, status, connections, " +
                 "exports, activities");
 
-        Document doc = Jsoup.connect("https://api.vk.com/method/users.get")
+        return Jsoup.connect(url)
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
                 .referrer("http://www.google.com")
                 .ignoreContentType(true)
                 .data(map)
                 .post();
-
-        return doc;
     }
 
-    public static Document connectDataGroup(String domain) throws IOException {
+    private static Document connectDataGroup(String domain) throws IOException {
         String url = "https://api.vk.com/method/groups.getMembers";
 
         HashMap<String, String> map = new HashMap<>();
@@ -79,30 +81,26 @@ public class WallParser {
         map.put("group_id", domain);
         map.put("v", versionAPI);
 
-        Document doc = Jsoup.connect(url)
+        return Jsoup.connect(url)
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
                 .referrer("http://www.google.com")
                 .ignoreContentType(true)
                 .data(map)
                 .post();
-
-        return doc;
     }
 
-    public static void createDataBase(ArrayList<User> arrayList) throws SQLException, ClassNotFoundException {
-        DataBase dataBase = new DataBase();
+    private static void createDataBase(ArrayList<User> arrayList) throws SQLException, ClassNotFoundException {
         dataBase.initDataBase(arrayList);
     }
 
-    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
+    public void getUsers() throws IOException, SQLException, ClassNotFoundException {
         ArrayList<User> arrayList= new ArrayList<>();
-        String domain = "iu7memes";
         StringBuilder strId;
         Document doc;
 
-        System.out.print("Input token: ");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        token = reader.readLine();
+        //System.out.print("Input token: ");
+        //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        //token = reader.readLine();
 
         doc = connectDataGroup(domain);
         strId = parserDataGroup(doc.text());
@@ -112,3 +110,9 @@ public class WallParser {
         createDataBase(arrayList);
     }
 }
+
+/*
+String userName = "root";
+String password = "root";
+String connectionUrl = "jdbc:mysql://localhost:3306/test?useSSL=false";
+*/
