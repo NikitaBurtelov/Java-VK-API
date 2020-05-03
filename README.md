@@ -1,9 +1,5 @@
 # VK API &middot; [![Build Status](https://travis-ci.org/NikitaBurtelov/Java-VK-API.svg?branch=master)](https://travis-ci.org/NikitaBurtelov/Java-VK-API) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-<p align="right">
-    <a><img src="https://www.ixon.cloud/media/ciqpa3f3/api-2x.png" width="200" height="161"/></a>
-</p>
-
 Библиотека предназаначена для получения и систематизации общедоступных данных с персональных страниц пользоватаелей, состоящих в группах в Вконтакте. 
 
 ## How to use
