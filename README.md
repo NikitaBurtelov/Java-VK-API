@@ -1,4 +1,4 @@
-# VK API &middot;  [![Build Status](https://travis-ci.org/NikitaBurtelov/Java-VK-API.svg?branch=master)](https://travis-ci.org/NikitaBurtelov/Java-VK-API) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# VK API &middot;  [![Build Status](https://travis-ci.org/NikitaBurtelov/Java-VK-API.svg?branch=master)](https://travis-ci.org/NikitaBurtelov/Java-VK-API)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Библиотека предназаначена для получения и систематизации общедоступных данных с персональных страниц пользователей, состоящих в группах в Вконтакте. 
 
