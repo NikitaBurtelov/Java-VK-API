@@ -38,9 +38,9 @@
 
 ```xml
 <dependency>
-            <groupId>com.vk_api_lib</groupId>
-            <artifactId>com.vk_api_lib.dataUsers</artifactId>
-            <version>1.0-SNAPSHOT</version>
+        <groupId>com.vk_api_lib</groupId>
+        <artifactId>com.vk_api_lib.dataUsers</artifactId>
+        <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
