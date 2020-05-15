@@ -41,7 +41,7 @@
         <groupId>com.vk_api_lib</groupId>
         <artifactId>com.vk_api_lib.dataUsers</artifactId>
         <version>1.0-SNAPSHOT</version>
-</dependency>
+</dependency> 
 ```
 
 ### Время кода
