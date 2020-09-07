@@ -21,22 +21,26 @@ public class DataBase {
 
         try (Connection connection = DriverManager.getConnection(connectionUrl, userName, password);
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate("drop table if exists Users");
-            statement.executeUpdate("create table if not exists Users (id MEDIUMINT NOT NULL AUTO_INCREMENT, " +
+             /*statement.executeUpdate("drop table if exists Users");
+             statement.executeUpdate("create table if not exists Users (id MEDIUMINT NOT NULL AUTO_INCREMENT, " +
                     "userId INTEGER, first_name CHAR(255), last_name CHAR (255), " +
                     "mobile_phone CHAR(50) NULL, connections VARCHAR(255), " +
                     "home_town CHAR(255), photo_max_orig VARCHAR(255), " +
                     "has_mobile INTEGER, activities VARCHAR(1000) NULL," +
-                    " userOnline INTEGER, PRIMARY KEY (id))");
+                    " userOnline INTEGER, university_name CHAR(255), faculty_name CHAR(255)," +
+                     "PRIMARY KEY (id))");
+              */
+            //statement.executeUpdate("Insert into Users");
 
             addDataBase(arrayList, connection);
+            statement.close();
         }
     }
 
     private void addDataBase(ArrayList<User> arrayList, Connection connection) throws SQLException {
-        String sql = "INSERT INTO Users (userId, first_name, last_name, mobile_phone," +
+        String sql = "INSERT INTO UsersMsu (userId, first_name, last_name, mobile_phone," +
                 " connections, home_town, photo_max_orig," +
-                " has_mobile, activities, userOnline) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " has_mobile, activities, userOnline, university_name, faculty_name) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         for (User user : arrayList) {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -50,6 +54,10 @@ public class DataBase {
             preparedStatement.setInt(8, user.has_mobile);
             preparedStatement.setString(9, user.activities);
             preparedStatement.setInt(10, user.online);
+            preparedStatement.setString(11, user.university_name);
+            preparedStatement.setString(12, user.faculty_name);
+
+            //System.out.println(user.count);
 
             preparedStatement.executeUpdate();
         }

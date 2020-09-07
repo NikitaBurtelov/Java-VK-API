@@ -17,7 +17,7 @@ public class WallParser {
     private static String versionAPI;
     private static String domain;
     private static DataBase dataBase;
-
+    private static int countVKGroup;
 
     public WallParser(String token, String versionAPI, String domain, DataBase dataBase) {
         WallParser.token = token;
@@ -26,7 +26,11 @@ public class WallParser {
         WallParser.dataBase = dataBase;
     }
 
-    private static StringBuilder parserDataGroup(String response){
+    private static int fiendCountVKGroup(String response) {
+        return (new JSONObject(response)).getJSONObject("response").getInt("count");
+    }
+
+    private static StringBuilder parserDataGroup(String response) {
         JSONObject jsonObject = new JSONObject(response);
         JSONObject responseObject = jsonObject.getJSONObject("response");
         JSONArray array = responseObject.getJSONArray("items");
@@ -43,6 +47,7 @@ public class WallParser {
     private static void parserDataUser(String response, ArrayList<User> arrayList) {
         Gson gson = new Gson();
         JSONObject jsonObject = new JSONObject(response);
+        System.out.println(jsonObject);
         JSONArray array = jsonObject.getJSONArray("response");
 
         for (int i = 0; i < array.length(); i++) {
@@ -62,7 +67,7 @@ public class WallParser {
         map.put("user_ids", strId.toString());
         map.put("fields", "city, country, home_town, " +
                 "photo_max_orig, online, domain, has_mobile," +
-                " contacts, site, education, status, connections, " +
+                " contacts, site, education, connections, " +
                 "exports, activities");
 
         return Jsoup.connect(url)
@@ -73,12 +78,14 @@ public class WallParser {
                 .post();
     }
 
-    private static Document connectDataGroup(String domain) throws IOException {
+    private static Document connectDataGroup(String domain, String offset) throws IOException {
         String url = "https://api.vk.com/method/groups.getMembers";
 
         HashMap<String, String> map = new HashMap<>();
         map.put("access_token", token);
+        map.put("offset", offset); //смещение
         map.put("group_id", domain);
+        map.put("count", "1000");
         map.put("v", versionAPI);
 
         return Jsoup.connect(url)
@@ -89,30 +96,48 @@ public class WallParser {
                 .post();
     }
 
-    private static void createDataBase(ArrayList<User> arrayList) throws SQLException, ClassNotFoundException {
-        dataBase.initDataBase(arrayList);
+    private static void createDataBase(ArrayList<User> arrayList) {
+        try {
+            dataBase.initDataBase(arrayList);
+        }
+        catch (SQLException | ClassNotFoundException exception) {
+            exception.printStackTrace();
+        }
     }
 
-    public void getUsers() throws IOException, SQLException, ClassNotFoundException {
-        ArrayList<User> arrayList= new ArrayList<>();
-        StringBuilder strId;
-        Document doc;
+    public void getUsers(String offset) {
+        try {
+            ArrayList<User> arrayList = new ArrayList<>();
+            StringBuilder strId;
+            Document doc;
 
-        //System.out.print("Input token: ");
-        //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        //token = reader.readLine();
+            for (int offsetNow = 0; offsetNow <= countVKGroup; offsetNow += 1000) {
+                doc = connectDataGroup(domain, String.valueOf(offsetNow));
+                countVKGroup = fiendCountVKGroup(doc.text());
+                strId = parserDataGroup(doc.text());
+                doc = connectDataUser(strId);
+                parserDataUser(doc.text(), arrayList);
+                System.out.println(arrayList.size());
+                createDataBase(arrayList);
+                arrayList.clear();
+                System.out.println(offsetNow);
+                //Thread.sleep(0,33);
+            }
 
-        doc = connectDataGroup(domain);
-        strId = parserDataGroup(doc.text());
-        doc = connectDataUser(strId);
+        }
+        catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
 
-        parserDataUser(doc.text(), arrayList);
-        createDataBase(arrayList);
+    public static void main(String[] args) {
+        String token = "974e814f974e814f974e814f68973f0f159974e974e814fc9e4672f03f17c57623e9aef";
+        String versionAPI = "5.103";
+        String domain = "msu_official";
+
+        DataBase dataBase = new DataBase("root", "root", "jdbc:mysql://localhost:3306/test?useSSL=false");
+        WallParser wallParser = new WallParser(token, versionAPI, domain, dataBase);
+
+        wallParser.getUsers(String.valueOf(countVKGroup));
     }
 }
-
-/*
-String userName = "root";
-String password = "root";
-String connectionUrl = "jdbc:mysql://localhost:3306/test?useSSL=false";
-*/

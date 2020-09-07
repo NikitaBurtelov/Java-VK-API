@@ -2,6 +2,7 @@ package com.vk_api_lib.dataUsers.dataUser;
 
 public class User {
     public int id;
+    public int count;
     public String first_name;
     public String last_name;
     public String connections;
@@ -18,4 +19,11 @@ public class User {
     public String site;
     public String home_town;
     public String activities;
+    public String faculty_name;
+    public String university_name;
+    public String education_form;
+
+    //public String education;
+    //public Universities universities;
+    //public String schools;
 }
