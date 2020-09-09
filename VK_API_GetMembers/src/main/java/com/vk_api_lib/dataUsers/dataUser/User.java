@@ -2,7 +2,7 @@ package com.vk_api_lib.dataUsers.dataUser;
 
 public class User {
     public int id;
-    public int count;
+    public String bdate;
     public String first_name;
     public String last_name;
     public String connections;

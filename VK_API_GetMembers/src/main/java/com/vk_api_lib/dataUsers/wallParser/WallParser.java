@@ -30,32 +30,17 @@ public class WallParser {
         return (new JSONObject(response)).getJSONObject("response").getInt("count");
     }
 
-    private static StringBuilder parserDataGroup(String response) {
+    private static void readUsersGroup(String response, ArrayList<User> arrList) {
+        Gson gson = new Gson();
         JSONObject jsonObject = new JSONObject(response);
         JSONObject responseObject = jsonObject.getJSONObject("response");
         JSONArray array = responseObject.getJSONArray("items");
-        StringBuilder strId = new StringBuilder();
-
-        for (int i = 0; i < array.length(); i++) {
-            strId.append(Integer.toString(array.getInt(i)));
-            strId.append(",");
-        }
-
-        return strId;
-    }
-
-    private static void parserDataUser(String response, ArrayList<User> arrayList) {
-        Gson gson = new Gson();
-        JSONObject jsonObject = new JSONObject(response);
-        System.out.println(jsonObject);
-        JSONArray array = jsonObject.getJSONArray("response");
 
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
             User user = gson.fromJson(object.toString(), User.class);
-            arrayList.add(user);
+            arrList.add(user);
         }
-
     }
 
     private static Document connectDataUser(StringBuilder strId) throws IOException {
@@ -67,7 +52,7 @@ public class WallParser {
         map.put("user_ids", strId.toString());
         map.put("fields", "city, country, home_town, " +
                 "photo_max_orig, online, domain, has_mobile," +
-                " contacts, site, education, connections, " +
+                "contacts, site, education, connections, " +
                 "exports, activities");
 
         return Jsoup.connect(url)
@@ -87,6 +72,7 @@ public class WallParser {
         map.put("group_id", domain);
         map.put("count", "1000");
         map.put("v", versionAPI);
+        map.put("fields","sex, bdate, city, country, photo_max_orig, site, education, contacts");
 
         return Jsoup.connect(url)
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -105,39 +91,32 @@ public class WallParser {
         }
     }
 
-    public void getUsers(String offset) {
+    public void getUsers() {
         try {
             ArrayList<User> arrayList = new ArrayList<>();
             StringBuilder strId;
             Document doc;
+            int sizeArrList;
 
-            for (int offsetNow = 0; offsetNow <= countVKGroup; offsetNow += 1000) {
-                doc = connectDataGroup(domain, String.valueOf(offsetNow));
-                countVKGroup = fiendCountVKGroup(doc.text());
-                strId = parserDataGroup(doc.text());
-                doc = connectDataUser(strId);
-                parserDataUser(doc.text(), arrayList);
-                System.out.println(arrayList.size());
+            for (int offsetNow = 0; offsetNow <= countVKGroup;) {
+                doc = connectDataGroup(domain, String.valueOf(offsetNow)); //count + dataUser //re Json
+                System.out.println(doc.text());
+                countVKGroup = fiendCountVKGroup(doc.text()); //re int
+                readUsersGroup(doc.text(), arrayList);
+
+                sizeArrList = arrayList.size();
+
+                if (sizeArrList == 0)
+                    break;
+
                 createDataBase(arrayList);
+                offsetNow += sizeArrList;
                 arrayList.clear();
-                System.out.println(offsetNow);
-                //Thread.sleep(0,33);
+                //System.out.println("Осталось запросов: ");
             }
-
         }
         catch (IOException exception) {
             exception.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        String token = "974e814f974e814f974e814f68973f0f159974e974e814fc9e4672f03f17c57623e9aef";
-        String versionAPI = "5.103";
-        String domain = "msu_official";
-
-        DataBase dataBase = new DataBase("root", "root", "jdbc:mysql://localhost:3306/test?useSSL=false");
-        WallParser wallParser = new WallParser(token, versionAPI, domain, dataBase);
-
-        wallParser.getUsers(String.valueOf(countVKGroup));
     }
 }

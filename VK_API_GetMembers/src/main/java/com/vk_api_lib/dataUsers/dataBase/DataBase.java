@@ -38,7 +38,7 @@ public class DataBase {
     }
 
     private void addDataBase(ArrayList<User> arrayList, Connection connection) throws SQLException {
-        String sql = "INSERT INTO UsersMsu (userId, first_name, last_name, mobile_phone," +
+        String sql = "INSERT INTO Users (userId, first_name, last_name, mobile_phone," +
                 " connections, home_town, photo_max_orig," +
                 " has_mobile, activities, userOnline, university_name, faculty_name) Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
