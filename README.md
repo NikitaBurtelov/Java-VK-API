@@ -40,7 +40,7 @@
 <dependency>
         <groupId>com.vk_api_lib</groupId>
         <artifactId>com.vk_api_lib.dataUsers</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.1</version>
 </dependency> 
 ```
 
@@ -65,10 +65,8 @@ public static void main(String[] args) throws SQLException, IOException, ClassNo
         String token = "<your token>";
         String versionAPI = "<current version>";
         String domain = "<group id>";
+        String connectionUrl = "jdbc:mysql://localhost:3306/test?useSSL=false";
 
-        DataBase dataBase = new DataBase("root", "root", "jdbc:mysql://localhost:3306/test?useSSL=false");
-        WallParser wallParser = new WallParser(token, versionAPI, domain, dataBase);
-
-        wallParser.getUsers();
+        (new WallParser(token, versionAPI, domain, new DataBase("root", "root", connectionUrl))).getUsers();
 }
 ```
