@@ -61,7 +61,7 @@
 Результатом метода `getUsers` будет таблица с нужной информацией.
 
 ```Java
-public static void main(String[] args) throws SQLException, IOException, ClassNotFoundException {
+public static void main(String[] args) {
         String token = "<your token>";
         String versionAPI = "<current version>";
         String domain = "<group id>";
